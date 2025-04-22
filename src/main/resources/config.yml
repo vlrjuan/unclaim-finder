@@ -1,0 +1,17 @@
+finders: # The list of finders to be used
+  - name: "ariusobjects:finder1" # The ItemAdder finder name (namespace:name)
+    range: 30 # The range in blocks to search for containers
+    containers: # The list of containers to search for (e.g., chests, furnaces)
+      - "minecraft:chest"
+      - "minecraft:furnace"
+  - name: "ariusobjects:finder2"
+    range: 30
+    containers:
+      - "minecraft:chest"
+      - "minecraft:furnace"
+
+messages:
+  # Sent to the player when the finder is used
+  # {containers} will be replaced with the number of containers found
+  # {range} will be replaced with the finder's range
+  result: "&7UnclaimFinder &8| &7&c{containers} &7conteneur(s) trouvé(s) dans un rayon de &c{range} &7bloc(s)"
