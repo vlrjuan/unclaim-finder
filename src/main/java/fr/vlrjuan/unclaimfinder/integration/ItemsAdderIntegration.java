@@ -9,29 +9,22 @@ import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Locale;
+import java.util.Optional;
 
 public enum ItemsAdderIntegration {
     ON(NamedTextColor.GREEN) {
         @Override
         public String getNamespace(Block block) {
-            CustomBlock customBlock = CustomBlock.byAlreadyPlaced(block);
-
-            if (customBlock != null) {
-                return customBlock.getNamespacedID();
-            }
-
-            return super.getNamespace(block);
+            return Optional.ofNullable(CustomBlock.byAlreadyPlaced(block))
+                    .map(CustomBlock::getNamespacedID)
+                    .orElse(super.getNamespace(block));
         }
 
         @Override
         public String getNamespace(ItemStack item) {
-            CustomStack customItem = CustomStack.byItemStack(item);
-
-            if (customItem != null) {
-                return customItem.getNamespacedID();
-            }
-
-            return super.getNamespace(item);
+            return Optional.ofNullable(CustomStack.byItemStack(item))
+                    .map(CustomStack::getNamespacedID)
+                    .orElse(super.getNamespace(item));
         }
     },
     OFF(NamedTextColor.RED);
