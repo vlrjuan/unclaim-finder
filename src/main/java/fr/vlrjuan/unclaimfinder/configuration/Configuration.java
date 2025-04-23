@@ -1,8 +1,12 @@
 package fr.vlrjuan.unclaimfinder.configuration;
 
 import fr.vlrjuan.unclaimfinder.UnclaimFinder;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.JoinConfiguration;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.slf4j.Logger;
 
 import java.util.HashMap;
 import java.util.List;
@@ -13,16 +17,19 @@ import java.util.stream.Collectors;
 
 public class Configuration {
 
-    private static final String DEFAULT_FINDER_RESULT_MESSAGE = "&7UnclaimFinder &8| &7&c{containers} &7conteneur(s) trouvé(s) dans un rayon de &c{range} &7bloc(s)";
+    private static final String CONTAINERS_PLACEHOLDER = "{containers}";
+    private static final String RANGE_PLACEHOLDER = "{range}";
 
-    private final Logger logger;
+    private static final String DEFAULT_FINDER_RESULT_MESSAGE = "&7UnclaimFinder &8| &7&c%s &7conteneur(s) trouvé(s) dans un rayon de &c%s &7bloc(s)".formatted(CONTAINERS_PLACEHOLDER, RANGE_PLACEHOLDER);
+
+    private final ComponentLogger logger;
     private final FileConfiguration configuration;
 
     // Data
     private Map<String, UnclaimFinder> finders = new HashMap<>();
     private String finderResultMessage;
 
-    public Configuration(Logger logger, FileConfiguration configuration) {
+    public Configuration(ComponentLogger logger, FileConfiguration configuration) {
         this.logger = logger;
         this.configuration = configuration;
     }
@@ -42,18 +49,45 @@ public class Configuration {
 
                     return UnclaimFinder.deserialize((Map<String, Object>) data);
                 })
-                .collect(Collectors.toMap(UnclaimFinder::name, Function.identity()));
+                .collect(Collectors.toMap(UnclaimFinder::namespace, Function.identity()));
 
-        logger.info("Loaded {} finders ({})", this.finders.size(), String.join(", ", this.finders.keySet()));
+        logger.info(
+                Component.text()
+                        .append(Component.text("Loaded"))
+                        .appendSpace()
+                        .append(Component.text(this.finders.size(), NamedTextColor.GREEN, TextDecoration.BOLD))
+                        .appendSpace()
+                        .append(Component.text("finder(s)"))
+                        .appendSpace()
+                        .append(
+                                Component.join(
+                                        JoinConfiguration.builder()
+                                                .prefix(Component.text("("))
+                                                .suffix(Component.text(")"))
+                                                .separator(Component.text(","))
+                                                .build(),
+                                        this.finders.keySet().stream()
+                                                .map(key -> Component.text()
+                                                        .append(Component.text("\""))
+                                                        .append(Component.text(key, NamedTextColor.GRAY))
+                                                        .append(Component.text("\""))
+                                                )
+                                                .toList()
+                                )
+                        )
+                        .build()
+        );
 
         finderResultMessage = configuration.getString("messages.result", DEFAULT_FINDER_RESULT_MESSAGE);
     }
 
-    public Optional<UnclaimFinder> getFinder(String name) {
-        return Optional.ofNullable(finders.get(name));
+    public Optional<UnclaimFinder> getUnclaimFinder(String namespace) {
+        return Optional.ofNullable(finders.get(namespace));
     }
 
-    public String getFinderResultMessage() {
-        return finderResultMessage;
+    public String getFinderResultMessage(int containers, int range) {
+        return finderResultMessage
+                .replace(CONTAINERS_PLACEHOLDER, String.valueOf(containers))
+                .replace(RANGE_PLACEHOLDER, String.valueOf(range));
     }
 }

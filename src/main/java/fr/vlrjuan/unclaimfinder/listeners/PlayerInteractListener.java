@@ -1,7 +1,7 @@
 package fr.vlrjuan.unclaimfinder.listeners;
 
-import dev.lone.itemsadder.api.CustomStack;
 import fr.vlrjuan.unclaimfinder.UnclaimFinder;
+import fr.vlrjuan.unclaimfinder.integration.ItemsAdderIntegration;
 import fr.vlrjuan.unclaimfinder.configuration.Configuration;
 import fr.vlrjuan.unclaimfinder.utils.ChatUtils;
 import org.bukkit.Location;
@@ -12,12 +12,16 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Collection;
+
 public class PlayerInteractListener implements Listener {
 
     private final Configuration configuration;
+    private final ItemsAdderIntegration itemsAdderIntegration;
 
-    public PlayerInteractListener(Configuration configuration) {
+    public PlayerInteractListener(Configuration configuration, ItemsAdderIntegration itemsAdderIntegration) {
         this.configuration = configuration;
+        this.itemsAdderIntegration = itemsAdderIntegration;
     }
 
     @EventHandler
@@ -33,26 +37,19 @@ public class PlayerInteractListener implements Listener {
             return;
         }
 
-        CustomStack finderItem = CustomStack.byItemStack(item);
-        if (finderItem == null) {
-            return;
-        }
+        String namespace = itemsAdderIntegration.getNamespace(item);
 
-        configuration.getFinder(finderItem.getNamespacedID())
+        configuration.getUnclaimFinder(namespace)
                 .ifPresent(finder -> useFinder(player, finder));
     }
 
     private void useFinder(Player player, UnclaimFinder finder) {
-        int range = finder.range();
+        int containers = getContainers(player.getLocation(), finder.range(), finder.containers());
 
-        String resultMessage = configuration.getFinderResultMessage()
-                .replace("{containers}", String.valueOf(getContainers(player.getLocation(), range, finder)))
-                .replace("{range}", String.valueOf(range));
-
-        ChatUtils.sendMessage(player, resultMessage);
+        ChatUtils.sendMessage(player, configuration.getFinderResultMessage(containers, finder.range()));
     }
 
-    private int getContainers(Location middle, int range, UnclaimFinder finder) {
+    private int getContainers(Location middle, int range, Collection<String> availableContainers) {
         int containers = 0;
 
         for (int x = -range; x <= range; x++) {
@@ -60,7 +57,7 @@ public class PlayerInteractListener implements Listener {
                 for (int z = -range; z <= range; z++) {
                     Block block = middle.getBlock().getRelative(x, y, z);
 
-                    if (finder.matchesContainer(block)) {
+                    if (availableContainers.contains(itemsAdderIntegration.getNamespace(block))) {
                         containers++;
                     }
                 }
