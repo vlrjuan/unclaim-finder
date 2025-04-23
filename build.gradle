@@ -1,31 +1,31 @@
 plugins {
     id 'java'
-    id("xyz.jpenilla.run-paper") version "2.3.1"
+    id('xyz.jpenilla.run-paper') version '2.3.1'
 }
 
 group = 'fr.vlrjuan'
-version = '1.1.0'
+version = '2.0.0'
 description = 'UnclaimFinder is a plugin that allows players to find containers in a specified range'
 
 repositories {
     mavenCentral()
     maven {
-        name = "papermc-repo"
-        url = "https://repo.papermc.io/repository/maven-public/"
+        name = 'papermc-repo'
+        url = 'https://repo.papermc.io/repository/maven-public/'
     }
     maven {
-        name = "sonatype"
-        url = "https://oss.sonatype.org/content/groups/public/"
+        name = 'sonatype'
+        url = 'https://oss.sonatype.org/content/groups/public/'
     }
     maven {
-        name = "matteodev"
-        url = "https://maven.devs.beer/"
+        name = 'matteodev'
+        url = 'https://maven.devs.beer/'
     }
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.20.6-R0.1-SNAPSHOT")
-    compileOnly("dev.lone:api-itemsadder:4.0.10")
+    compileOnly('io.papermc.paper:paper-api:1.20.6-R0.1-SNAPSHOT')
+    compileOnly('dev.lone:api-itemsadder:4.0.10')
 }
 
 tasks {
@@ -33,7 +33,7 @@ tasks {
         // Configure the Minecraft version for our task.
         // This is the only required configuration besides applying the plugin.
         // Your plugin's jar (or shadowJar if present) will be used automatically.
-        minecraftVersion("1.20.6")
+        minecraftVersion('1.20.6')
     }
 }
 

@@ -1,8 +1,7 @@
 finders: # The list of finders to be used
-  - name: "ariusobjects:finder1" # The ItemAdder finder name (must match the one in the ItemAdder config)
+  - namespace: "minecraft:compass" # The namespace of the finder
     range: 30 # The range in blocks to search for containers
-    # The list of containers to search for (e.g., chests, furnaces, etc.).
-    # Containers must be in the format "namespace:name" (e.g., "minecraft:chest").
+    # The list of container namespace to search for (e.g., chests, furnaces, etc.).
     containers:
       - "minecraft:chest"
       - "minecraft:furnace"
