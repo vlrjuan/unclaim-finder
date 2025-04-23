@@ -13,6 +13,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Collection;
+import java.util.Map;
 
 public class PlayerInteractListener implements Listener {
 
@@ -44,9 +45,12 @@ public class PlayerInteractListener implements Listener {
     }
 
     private void useFinder(Player player, UnclaimFinder finder) {
-        int containers = getContainers(player.getLocation(), finder.range(), finder.containers());
+        int foundContainers = getContainers(player.getLocation(), finder.range(), finder.containers());
 
-        ChatUtils.sendMessage(player, configuration.getFinderResultMessage(containers, finder.range()));
+        ChatUtils.sendMessage(player, finder.message(),
+                Map.entry(UnclaimFinder.CONTAINERS_PLACEHOLDER, String.valueOf(foundContainers)),
+                Map.entry(UnclaimFinder.RANGE_PLACEHOLDER, String.valueOf(finder.range()))
+        );
     }
 
     private int getContainers(Location middle, int range, Collection<String> availableContainers) {

@@ -17,17 +17,11 @@ import java.util.stream.Collectors;
 
 public class Configuration {
 
-    private static final String CONTAINERS_PLACEHOLDER = "{containers}";
-    private static final String RANGE_PLACEHOLDER = "{range}";
-
-    private static final String DEFAULT_FINDER_RESULT_MESSAGE = "&7UnclaimFinder &8| &7&c%s &7conteneur(s) trouvé(s) dans un rayon de &c%s &7bloc(s)".formatted(CONTAINERS_PLACEHOLDER, RANGE_PLACEHOLDER);
-
     private final ComponentLogger logger;
     private final FileConfiguration configuration;
 
     // Data
     private Map<String, UnclaimFinder> finders = new HashMap<>();
-    private String finderResultMessage;
 
     public Configuration(ComponentLogger logger, FileConfiguration configuration) {
         this.logger = logger;
@@ -77,17 +71,9 @@ public class Configuration {
                         )
                         .build()
         );
-
-        finderResultMessage = configuration.getString("messages.result", DEFAULT_FINDER_RESULT_MESSAGE);
     }
 
     public Optional<UnclaimFinder> getUnclaimFinder(String namespace) {
         return Optional.ofNullable(finders.get(namespace));
-    }
-
-    public String getFinderResultMessage(int containers, int range) {
-        return finderResultMessage
-                .replace(CONTAINERS_PLACEHOLDER, String.valueOf(containers))
-                .replace(RANGE_PLACEHOLDER, String.valueOf(range));
     }
 }
