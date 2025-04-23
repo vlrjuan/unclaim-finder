@@ -1,32 +1,39 @@
 package fr.vlrjuan.unclaimfinder;
 
+import dev.lone.itemsadder.api.CustomBlock;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.block.Block;
 
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 
-public record UnclaimFinder(String name, int range, Collection<Material> containers) {
+public record UnclaimFinder(String name, int range, Collection<String> containers) {
 
     @SuppressWarnings("unchecked")
     public static UnclaimFinder deserialize(Map<String, Object> data) {
         String name = (String) data.get("name");
-        int radius = (int) data.get("range");
-        Collection<String> containerNames = (Collection<String>) data.get("containers");
+        int range = (int) data.get("range");
+        Collection<String> containers = (Collection<String>) data.get("containers");
 
-        if (name == null || radius <= 0 || containerNames == null) {
+        if (name == null || range <= 0 || containers == null) {
             throw new IllegalArgumentException("Invalid finder data");
         }
 
-        Collection<Material> containers = containerNames.stream()
-                .map(Material::matchMaterial)
-                .filter(Objects::nonNull)
-                .toList();
-
-        return new UnclaimFinder(name, radius, containers);
+        return new UnclaimFinder(name, range, containers);
     }
 
-    public boolean matchesContainer(Material material) {
-        return containers.contains(material);
+    @SuppressWarnings("ConstantValue") // False positive
+    public boolean matchesContainer(Block block) {
+        return matchesContainer(block.getType()) || matchesContainer(CustomBlock.byAlreadyPlaced(block));
+    }
+
+    private boolean matchesContainer(Material material) {
+        return containers.contains("%s:%s".formatted(NamespacedKey.MINECRAFT, material.name().toLowerCase(Locale.ROOT)));
+    }
+
+    private boolean matchesContainer(CustomBlock customBlock) {
+        return customBlock != null && containers.contains(customBlock.getNamespacedID());
     }
 }

@@ -5,7 +5,7 @@ import fr.vlrjuan.unclaimfinder.UnclaimFinder;
 import fr.vlrjuan.unclaimfinder.configuration.Configuration;
 import fr.vlrjuan.unclaimfinder.utils.ChatUtils;
 import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -58,9 +58,9 @@ public class PlayerInteractListener implements Listener {
         for (int x = -range; x <= range; x++) {
             for (int y = -range; y <= range; y++) {
                 for (int z = -range; z <= range; z++) {
-                    Material blockType = middle.getBlock().getRelative(x, y, z).getType();
+                    Block block = middle.getBlock().getRelative(x, y, z);
 
-                    if (finder.matchesContainer(blockType)) {
+                    if (finder.matchesContainer(block)) {
                         containers++;
                     }
                 }
