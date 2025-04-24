@@ -1,14 +1,14 @@
 package fr.vlrjuan.unclaimfinder.integration;
 
 import dev.lone.itemsadder.api.CustomBlock;
+import dev.lone.itemsadder.api.CustomEntity;
 import dev.lone.itemsadder.api.CustomStack;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Locale;
 import java.util.Optional;
 
 public enum ItemsAdderIntegration {
@@ -25,6 +25,13 @@ public enum ItemsAdderIntegration {
             return Optional.ofNullable(CustomStack.byItemStack(item))
                     .map(CustomStack::getNamespacedID)
                     .orElse(super.getNamespace(item));
+        }
+
+        @Override
+        public String getNamespace(Entity entity) {
+            return Optional.ofNullable(CustomEntity.byAlreadySpawned(entity))
+                    .map(CustomEntity::getNamespacedID)
+                    .orElse(super.getNamespace(entity));
         }
     },
     OFF(NamedTextColor.RED);
@@ -47,8 +54,12 @@ public enum ItemsAdderIntegration {
         return getNamespace(item.getType());
     }
 
+    public String getNamespace(Entity entity) {
+        return entity.getType().getKey().toString();
+    }
+
     private String getNamespace(Material material) {
-        return "%s:%s".formatted(NamespacedKey.MINECRAFT, material.name().toLowerCase(Locale.ROOT));
+        return material.getKey().toString();
     }
 
     public NamedTextColor getColor() {
